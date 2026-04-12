@@ -95,7 +95,7 @@ def is_title_l1(text):
 
 def is_title_l2(text):
     """二级标题：（一）格式"""
-    return text.startswith('（') and '）' in text[:6])
+    return text.startswith('（') and '）' in text[:6]
 
 def is_salutation(text):
     """称谓行：尊敬的...、市政府：等"""

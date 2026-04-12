@@ -8,6 +8,8 @@ from docx import Document
 from docx.shared import Pt, Cm
 from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_LINE_SPACING
 from docx.oxml.ns import qn
+from docx.oxml import OxmlElement
+from pathlib import Path
 import zipfile
 import shutil
 from lxml import etree
@@ -82,12 +84,30 @@ def scorched_earth(para):
 def set_font(run, font_name, size_pt):
     """设置run字体"""
     run.font.name = font_name
-    run._element.rPr.rFonts.set(qn('w:eastAsia'), font_name)
+    rPr = run._element.get_or_add_rPr()
+    rFonts = OxmlElement('w:rFonts')
+    rFonts.set(qn('w:eastAsia'), font_name)
+    rPr.insert(0, rFonts)
     run.font.size = Pt(size_pt)
 
 # ==========================================
 # 页码处理（已验证，正确）
 # ==========================================
+
+def _get_max_rid(part):
+    """扫描已用rId，返回最大值+1"""
+    max_id = 0
+    for rel in part.rels.values():
+        rid = rel.rId
+        if rid.startswith('rId'):
+            try:
+                num = int(rid[3:])
+                if num > max_id:
+                    max_id = num
+            except ValueError:
+                pass
+    return max_id + 1
+
 
 def add_page_numbers(doc, template_path=None):
     """
@@ -97,12 +117,12 @@ def add_page_numbers(doc, template_path=None):
     - 首页不显示
     """
     if template_path is None:
-        template_path = "/home/zyu/.openclaw/media/inbound/请示2---159f9e22-4054-4c15-bb9d-2169d31ef81f.docx"
+        template_path = Path(__file__).parent.parent / "templates/request/request-sample-001.docx"
     
-    # 从模板获取footer
+    # 从模板获取footer（footer2.xml可选）
     with zipfile.ZipFile(template_path, 'r') as z:
         footer1_content = z.read('word/footer1.xml')
-        footer2_content = z.read('word/footer2.xml')
+        footer2_content = z.read('word/footer2.xml') if 'word/footer2.xml' in z.namelist() else None
     
     section = doc.sections[0]
     
@@ -122,21 +142,27 @@ def add_page_numbers(doc, template_path=None):
     if titlePg is not None:
         sectPr.remove(titlePg)
     
+    # 动态分配rId，避免冲突
+    part = doc.part
+    max_rid = _get_max_rid(part)
+    rid_footer_odd = f'rId{max_rid}'
+    rid_footer_even = f'rId{max_rid + 1}'
+    
     # 添加footer引用
     FooterRef1 = etree.SubElement(sectPr, '{%s}footerReference' % ns_w)
     FooterRef1.set('{%s}type' % ns_r, 'default')
-    FooterRef1.set('{%s}id' % ns_r, 'rId99')
+    FooterRef1.set('{%s}id' % ns_r, rid_footer_odd)
     
-    FooterRef2 = etree.SubElement(sectPr, '{%s}footerReference' % ns_w)
-    FooterRef2.set('{%s}type' % ns_r, 'even')
-    FooterRef2.set('{%s}id' % ns_r, 'rId98')
+    if footer2_content is not None:
+        FooterRef2 = etree.SubElement(sectPr, '{%s}footerReference' % ns_w)
+        FooterRef2.set('{%s}type' % ns_r, 'even')
+        FooterRef2.set('{%s}id' % ns_r, rid_footer_even)
     
     # 添加首页不同
     titlePg = etree.SubElement(sectPr, '{%s}titlePg' % ns_w)
     titlePg.set('{%s}val' % ns_w, '1')
     
     # 添加到content_types
-    part = doc.part
     ct = part.package.part_related_by('http://schemas.openxmlformats.org/package/2006/content-types', '[Content_Types].xml')
     ct_root = etree.fromstring(ct.blob)
     ns_ct = 'http://schemas.openxmlformats.org/package/2006/content-types'
@@ -146,7 +172,7 @@ def add_page_numbers(doc, template_path=None):
         o = etree.SubElement(ct_root, '{%s}Override' % ns_ct)
         o.set('PartName', '/word/footer1.xml')
         o.set('ContentType', 'application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml')
-    if '/word/footer2.xml' not in existing:
+    if footer2_content is not None and '/word/footer2.xml' not in existing:
         o = etree.SubElement(ct_root, '{%s}Override' % ns_ct)
         o.set('PartName', '/word/footer2.xml')
         o.set('ContentType', 'application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml')
@@ -154,18 +180,20 @@ def add_page_numbers(doc, template_path=None):
     
     # 添加到rels
     rels = part.rels
-    rels['rId99'] = type(rels.popitem()[1])(
+    rels[rid_footer_odd] = type(rels.popitem()[1])(
         'http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer',
         'footer1.xml'
     )
-    rels['rId98'] = type(rels.popitem()[1])(
-        'http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer',
-        'footer2.xml'
-    )
+    if footer2_content is not None:
+        rels[rid_footer_even] = type(rels.popitem()[1])(
+            'http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer',
+            'footer2.xml'
+        )
     
     # 添加footer blob
-    doc.part.add_relationship('http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer', 'footer1.xml', 'rId99')
-    doc.part.add_relationship('http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer', 'footer2.xml', 'rId98')
+    doc.part.add_relationship('http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer', 'footer1.xml', rid_footer_odd)
+    if footer2_content is not None:
+        doc.part.add_relationship('http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer', 'footer2.xml', rid_footer_even)
     
     # 直接修改zip
     return doc
