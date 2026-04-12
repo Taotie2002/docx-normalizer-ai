@@ -39,7 +39,7 @@ docx-normalizer-ai/
 ├── requirements.txt      # Python依赖
 ├── scripts/
 │   ├── __init__.py
-│   ├── dfp_tool.py       # 公文格式灌注工具
+│   ├── dfgp_tool.py       # 公文格式灌注工具
 │   ├── extract.py        # 格式提取CLI (骨架)
 │   └── apply.py          # 格式应用CLI (骨架)
 └── templates/
@@ -75,10 +75,10 @@ pip install -r requirements.txt
 
 ```bash
 # 基本用法
-python scripts/dfp_tool.py <输入文档> <输出文档> [页码模板]
+python scripts/dfgp_tool.py <输入文档> <输出文档> [页码模板]
 
 # 示例
-python scripts/dfp_tool.py input.docx output.docx templates/government/gov-001-template.docx
+python scripts/dfgp_tool.py input.docx output.docx templates/government/gov-001-template.docx
 ```
 
 ### 3. 使用CLI脚本
