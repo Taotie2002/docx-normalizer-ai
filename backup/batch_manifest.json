@@ -1,0 +1,31 @@
+{
+  "version": "1.0",
+  "created": "2026-04-12T23:20:00",
+  "backups": [
+    {
+      "id": "a84529b4",
+      "original_path": "/home/zyu/.openclaw/workspaces/Main/docx-normalizer-ai/templates/request/request-sample-001.docx",
+      "backup_path": "backup/request-sample-001_20260412_232000_a84529b4.docx",
+      "backup_filename": "request-sample-001_20260412_232000_a84529b4.docx",
+      "sha256": "f9632b40ad7f8a89ddf11f80643f6168ab2dc3956ad0077c1a2da944a28b3001",
+      "size_bytes": 22980,
+      "backup_time": "2026-04-12T23:20:00",
+      "original_sha256": "f9632b40ad7f8a89ddf11f80643f6168ab2dc3956ad0077c1a2da944a28b3001",
+      "batch_id": "cec64201"
+    },
+    {
+      "id": "c254a91b",
+      "original_path": "/home/zyu/.openclaw/workspaces/Main/docx-normalizer-ai/templates/request/request-sample-001.docx",
+      "backup_path": "backup/request-sample-001_20260412_232006_c254a91b.docx",
+      "backup_filename": "request-sample-001_20260412_232006_c254a91b.docx",
+      "sha256": "f9632b40ad7f8a89ddf11f80643f6168ab2dc3956ad0077c1a2da944a28b3001",
+      "size_bytes": 22980,
+      "backup_time": "2026-04-12T23:20:06",
+      "original_sha256": "f9632b40ad7f8a89ddf11f80643f6168ab2dc3956ad0077c1a2da944a28b3001",
+      "batch_id": "b1ad5e54"
+    }
+  ],
+  "last_batch_id": "b1ad5e54",
+  "last_batch_time": "2026-04-12T23:20:06",
+  "total_backups": 2
+}

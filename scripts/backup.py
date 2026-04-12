@@ -60,7 +60,15 @@ def backup_document(input_path: str, backup_dir: str = "backup") -> dict:
 
     # 计算SHA-256
     file_hash = sha256_file(backup_file_path)
+    original_sha256 = sha256_file(input_path)
     file_size = os.path.getsize(backup_file_path)
+
+    # F-12 第3条：备份后校验，sha256必须与original_sha256匹配
+    if file_hash != original_sha256:
+        raise RuntimeError(
+            f"备份完整性校验失败: {backup_file_path} 的SHA-256 ({file_hash}) "
+            f"与原文件 ({original_sha256}) 不匹配"
+        )
 
     entry = {
         "id": short_uuid,
@@ -70,7 +78,7 @@ def backup_document(input_path: str, backup_dir: str = "backup") -> dict:
         "sha256": file_hash,
         "size_bytes": file_size,
         "backup_time": datetime.now().isoformat(timespec='seconds'),
-        "original_sha256": sha256_file(input_path),
+        "original_sha256": original_sha256,
     }
 
     return entry

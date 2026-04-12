@@ -64,10 +64,10 @@ class SpacingDef:
     before_pt: Optional[float] = None  # before paragraph spacing
     after_pt: Optional[float] = None    # after paragraph spacing
     line_pt: Optional[float] = None     # line spacing
-    line_rule: str = "auto"             # auto or exact
+    line_rule: Optional[str] = None     # auto, exact, or atLeast (None if not set)
 
     def to_dict(self):
-        result = {'line_rule': self.line_rule}
+        result = {}
         if self.before_pt is not None:
             result['before_pt'] = self.before_pt
         if self.after_pt is not None:
@@ -233,7 +233,7 @@ def extract_spacing(pPr: etree._Element) -> Optional[SpacingDef]:
         before = spacing_elem.get(qn('before'))
         after = spacing_elem.get(qn('after'))
         line = spacing_elem.get(qn('line'))
-        line_rule = spacing_elem.get(qn('lineRule')) or 'auto'
+        line_rule_val = spacing_elem.get(qn('lineRule'))
 
         if before:
             spacing.before_pt = dxa_to_pt(int(before))
@@ -241,7 +241,8 @@ def extract_spacing(pPr: etree._Element) -> Optional[SpacingDef]:
             spacing.after_pt = dxa_to_pt(int(after))
         if line:
             spacing.line_pt = dxa_to_pt(int(line))
-        spacing.line_rule = line_rule
+        if line_rule_val:
+            spacing.line_rule = line_rule_val
 
     # Check if any spacing properties exist
     if spacing.before_pt is not None or spacing.after_pt is not None or spacing.line_pt is not None:

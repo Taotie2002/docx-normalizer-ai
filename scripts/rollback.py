@@ -99,9 +99,10 @@ def rollback_entry(backup_entry: dict, backup_dir: str = "backup") -> bool:
     if os.path.exists(original_path):
         current_hash = sha256_file(original_path)
         if current_hash != backup_entry.get('original_sha256'):
-            # 当前文件已修改，先保存当前状态
-            corrupt_backup = original_path + ".corrupt_before_rollback"
-            shutil.copy2(original_path, corrupt_backup)
+            # 当前文件已修改，先保存当前状态到backup目录
+            corrupt_name = f".corrupt_{Path(original_path).name}_{backup_entry['id']}"
+            corrupt_backup = Path(backup_dir) / corrupt_name
+            shutil.copy2(original_path, str(corrupt_backup))
             print(f"   ⚠️  当前文件已被修改，已备份到: {corrupt_backup}")
     
     # 执行恢复
