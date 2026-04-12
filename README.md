@@ -16,33 +16,48 @@
 
 ## 项目状态
 
-| 项目 | 状态 |
-|------|------|
-| 知识库框架 | ✅ 完成 |
-| 公文DFGP模板 | ✅ 已验证 |
-| 灌注工具 | ✅ 可用 |
-| CLI命令 | 🚧 规划中 |
-| 多Agent协同 | 🚧 规划中 |
+| 项目 | 状态 | 说明 |
+|------|------|------|
+| 知识库框架 | ✅ 完成 | 15种公文类型分类 |
+| 公文DFGP模板 | ✅ 已验证 | 4份请示+政府模板 |
+| 灌注工具 | ✅ 可用 | scripts/dfgp_tool.py |
+| CLI脚本 | ✅ 骨架 | extract.py/apply.py |
+| 多Agent协同 | 🚧 规划中 | 由agent-main仓库提供 |
+| 原子备份 | 🚧 规划中 | - |
 
 ---
 
 ## 目录结构
 
 ```
-docx-dfgp-knowledge/
+docx-normalizer-ai/
 ├── README.md              # 本文件
 ├── 分类索引.md            # 公文类型分类索引
-├── requirements.txt       # Python依赖
+├── LICENSE               # MIT许可证
+├── .gitignore            # Git忽略配置
+├── .env.example          # 环境变量示例
+├── requirements.txt      # Python依赖
 ├── scripts/
-│   └── dfgp_tool.py       # 公文格式灌注工具 (已验证)
+│   ├── __init__.py
+│   ├── dfp_tool.py       # 公文格式灌注工具
+│   ├── extract.py        # 格式提取CLI (骨架)
+│   └── apply.py          # 格式应用CLI (骨架)
 └── templates/
     ├── government/        # 政府公文模板
     │   ├── gov-001-template.docx
     │   └── dfgp-gov-001.md
     ├── request/           # 请示公文模板
-    │   ├── 请示1-4.docx   # 4份真实请示文档
+    │   ├── request-sample-001.docx
+    │   ├── request-sample-002.docx
+    │   ├── request-sample-003.docx
+    │   ├── request-sample-004.docx
     │   └── dfgp-request-001.md
     ├── student/           # 学生作业模板
+    │   ├── student-001-template.docx
+    │   └── dfgp-student-001.md
+    ├── academic/          # 🚧 待填充
+    ├── announcement/      # 🚧 待填充
+    ├── circular/          # 🚧 待填充
     └── ...                # 其他类型（待扩展）
 ```
 
@@ -60,13 +75,25 @@ pip install -r requirements.txt
 
 ```bash
 # 基本用法
-python scripts/dfgp_tool.py <输入文档> <输出文档> [页码模板]
+python scripts/dfp_tool.py <输入文档> <输出文档> [页码模板]
 
 # 示例
-python scripts/dfgp_tool.py input.docx output.docx templates/government/gov-001-template.docx
+python scripts/dfp_tool.py input.docx output.docx templates/government/gov-001-template.docx
 ```
 
-### 3. 灌注规则
+### 3. 使用CLI脚本
+
+```bash
+# 提取模板格式（骨架）
+python scripts/extract.py templates/government/gov-001-template.docx -o format.json
+
+# 应用格式到目标文档（骨架）
+python scripts/apply.py input.docx template.docx output.docx
+```
+
+---
+
+## 灌注规则（GB/T 9704-2012）
 
 | 段落类型 | 字体 | 字号 | 对齐 | 首行缩进 |
 |---------|------|------|------|---------|
@@ -131,23 +158,27 @@ def is_salutation(text):
 
 ## 公文类型分类（15种）
 
-| 类型 | 识别依据 |
-|------|---------|
-| 命令(令) | 标题含"命令"/"令"字 |
-| 决定 | 正文含"经研究决定" |
-| 公告 | 发布范围广泛、无主送机关 |
-| 通告 | 事项性质面向社会 |
-| 通知 | 标题含"通知"、有主送机关 |
-| 通报 | 含"通报批评"/"表彰" |
-| 报告 | 上行文、含"请审阅"/"请批示" |
-| 请示 | 上行文、含"妥否，请批示" |
-| 批复 | 回应请示、含"同意"/"不同意" |
-| 议案 | 提交人大审议 |
-| 函 | 平行文、无上下级隶属关系 |
-| 决议 | 含"会议决定" |
-| 指示 | 含安排部署性质 |
-| 条例 | 法规性质、标题含"条例" |
-| 纪要 | 标题含"纪要"、有出席人员 |
+| 类型 | 目录 | 识别依据 | 状态 |
+|------|------|---------|------|
+| 命令(令) | order/ | 标题含"命令"/"令"字 | 🚧 待填充 |
+| 决定 | decision/ | 正文含"经研究决定" | 🚧 待填充 |
+| 公告 | announcement/ | 发布范围广泛、无主送机关 | 🚧 待填充 |
+| 通告 | notice/ | 事项性质面向社会 | 🚧 待填充 |
+| 通知 | notification/ | 标题含"通知"、有主送机关 | 🚧 待填充 |
+| 通报 | circular/ | 含"通报批评"/"表彰" | 🚧 待填充 |
+| 报告 | report/ | 上行文、含"请审阅"/"请批示" | 🚧 待填充 |
+| 请示 | request/ | 上行文、含"妥否，请批示" | ✅ 4份模板 |
+| 批复 | reply/ | 回应请示、含"同意"/"不同意" | 🚧 待填充 |
+| 议案 | proposal/ | 提交人大审议 | 🚧 待填充 |
+| 函 | letter/ | 平行文、无上下级隶属关系 | 🚧 待填充 |
+| 决议 | resolution/ | 含"会议决定" | 🚧 待填充 |
+| 指示 | directive/ | 含安排部署性质 | 🚧 待填充 |
+| 条例 | regulation/ | 法规性质、标题含"条例" | 🚧 待填充 |
+| 纪要 | minutes/ | 标题含"纪要"、有出席人员 | 🚧 待填充 |
+| 政府公文 | government/ | 通用公文格式 | ✅ 已验证 |
+| 技术文档 | technical/ | API文档、技术手册 | 🚧 待填充 |
+| 学术论文 | academic/ | 论文、期刊文章 | 🚧 待填充 |
+| 学生作业 | student/ | 练习题、试卷 | ✅ 已验证 |
 
 ---
 
@@ -158,20 +189,11 @@ def is_salutation(text):
 | 1.0 | 2026-04-09 | 初始：2类模板 |
 | 2.0 | 2026-04-09 | 扩展15种公文类型 |
 | 2.1 | 2026-04-10 | 审计评分权重调整，新增行间距审计 |
-
----
-
-## 规划中功能
-
-- [ ] CLI命令（extract/apply/diff/batch）
-- [ ] 原子备份机制
-- [ ] 多Agent协同（钱串子/代码驴/审计狗）
-- [ ] YAML Schema解析器
-- [ ] 批量处理能力
+| 2.2 | 2026-04-12 | 修复仓库完整性，添加CLI骨架 |
 
 ---
 
 ## 相关仓库
 
 - [docx-normalizer-ai](https://github.com/Taotie2002/docx-normalizer-ai) - 本仓库，DFGP知识库
-- [agent-main](https://github.com/Taotie2002/agent-main) - OpenClaw主Agent工作区
+- [agent-main](https://github.com/Taotie2002/agent-main) - OpenClaw主Agent工作区（含多Agent协同实现）
