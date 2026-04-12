@@ -34,14 +34,14 @@ docx-dfgp-knowledge/
 ├── 分类索引.md            # 公文类型分类索引
 ├── requirements.txt       # Python依赖
 ├── scripts/
-│   └── dfp_tool.py       # 公文格式灌注工具 (已验证)
+│   └── dfgp_tool.py       # 公文格式灌注工具 (已验证)
 └── templates/
     ├── government/        # 政府公文模板
     │   ├── gov-001-template.docx
-    │   └── dfp-gov-001.md
+    │   └── dfgp-gov-001.md
     ├── request/           # 请示公文模板
     │   ├── 请示1-4.docx   # 4份真实请示文档
-    │   └── dfp-request-001.md
+    │   └── dfgp-request-001.md
     ├── student/           # 学生作业模板
     └── ...                # 其他类型（待扩展）
 ```
@@ -60,10 +60,10 @@ pip install -r requirements.txt
 
 ```bash
 # 基本用法
-python scripts/dfp_tool.py <输入文档> <输出文档> [页码模板]
+python scripts/dfgp_tool.py <输入文档> <输出文档> [页码模板]
 
 # 示例
-python scripts/dfp_tool.py input.docx output.docx templates/government/gov-001-template.docx
+python scripts/dfgp_tool.py input.docx output.docx templates/government/gov-001-template.docx
 ```
 
 ### 3. 灌注规则
