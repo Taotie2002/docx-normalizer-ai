@@ -43,15 +43,8 @@ docx-normalizer-ai/
 │   ├── extract.py        # 格式提取CLI (骨架)
 │   └── apply.py          # 格式应用CLI (骨架)
 └── templates/
-    ├── government/        # 政府公文模板
-    │   ├── gov-001-template.docx
+    ├── government/        # 政府公文模板（含请示、报告等子类型）
     │   └── dfgp-gov-001.md
-    ├── request/           # 请示公文模板
-    │   ├── request-sample-001.docx
-    │   ├── request-sample-002.docx
-    │   ├── request-sample-003.docx
-    │   ├── request-sample-004.docx
-    │   └── dfgp-request-001.md
     ├── student/           # 学生作业模板
     │   ├── student-001-template.docx
     │   └── dfgp-student-001.md
@@ -167,7 +160,7 @@ def is_salutation(text):
 | 通知 | notification/ | 标题含"通知"、有主送机关 | 🚧 待填充 |
 | 通报 | circular/ | 含"通报批评"/"表彰" | 🚧 待填充 |
 | 报告 | report/ | 上行文、含"请审阅"/"请批示" | 🚧 待填充 |
-| 请示 | request/ | 上行文、含"妥否，请批示" | ✅ 4份模板 |
+| 请示 | government/ | 上行文、含"妥否，请批示"，属于government子类型 | ✅ 已合并 |
 | 批复 | reply/ | 回应请示、含"同意"/"不同意" | 🚧 待填充 |
 | 议案 | proposal/ | 提交人大审议 | 🚧 待填充 |
 | 函 | letter/ | 平行文、无上下级隶属关系 | 🚧 待填充 |
